@@ -2,8 +2,8 @@ import { faker } from "@faker-js/faker";
 import { DataSource, EntityManager } from "typeorm";
 import { describe, expect, it } from "vitest";
 
-import { Course } from "@/infra/entities/course.entity";
-import { User } from "@/infra/entities/user.entity";
+import { Course } from "@/enroll/infra/entities/course.entity";
+import { User } from "@/enroll/infra/entities/user.entity";
 
 import { CreateCourseUC } from "./use-case";
 

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 import { Course } from "./course.entity";
 
@@ -6,9 +6,6 @@ import { Course } from "./course.entity";
 export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
-
-  @Column({ unique: true })
-  name: string;
 
   @ManyToMany(() => Course, (course) => course.members)
   courses: Course[];

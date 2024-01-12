@@ -1,7 +1,7 @@
 import { ApplicationError } from "domain-utilities";
 import { EntityManager } from "typeorm";
 
-import { Course as TypeORMCourse } from "@/infra/entities/course.entity";
+import { Course as TypeORMCourse } from "@/admin/infra/entities/course.entity";
 
 import {
   CreateCourseRequest,
@@ -15,7 +15,7 @@ import {
  * it only persists the name of a course, which is irrelevant to the business invariants
  */
 export class CreateCourseUC implements ICreateCourseUC {
-  constructor(private readonly manager: EntityManager) {}
+  constructor(private readonly manager: EntityManager) { }
 
   async execute(request: CreateCourseRequest): CreateCourseResponse {
     try {

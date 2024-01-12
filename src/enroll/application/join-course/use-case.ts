@@ -1,7 +1,7 @@
 import { ApplicationError, left, right } from "domain-utilities";
 
-import { Course } from "@/domain/course";
-import { UserRepository } from "@/infra/user";
+import { Course } from "@/enroll/domain/course";
+import { UserRepository } from "@/enroll/infra/user";
 
 import {
   IJoinCourseUC,
@@ -15,7 +15,7 @@ import {
  * it only persists the user name and password, which are not business concepts
  */
 export class JoinCourseUC implements IJoinCourseUC {
-  constructor(private readonly repo: UserRepository) {}
+  constructor(private readonly repo: UserRepository) { }
 
   async execute(request: JoinCourseRequest): JoinCourseResponse {
     try {
