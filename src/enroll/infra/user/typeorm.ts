@@ -1,8 +1,8 @@
 import { EntityManager } from "typeorm";
 
-import { Course as DomainCourse } from "@/domain/course";
-import { User as DomainUser } from "@/domain/user";
-import { User as TypeORMUser } from "@/infra/entities/user.entity";
+import { Course as DomainCourse } from "@/enroll/domain/course";
+import { User as DomainUser } from "@/enroll/domain/user";
+import { User as TypeORMUser } from "@/enroll/infra/entities/user.entity";
 
 import {
   PersistenceUser,
@@ -12,12 +12,12 @@ import {
 } from "./interface";
 
 class TypeORMUserMapper implements UserMapper {
-  toDomain({ id, ...props }: PersistenceUser): DomainUser {
-    const courses = props.courses.map((course) =>
+  toDomain({ id, courses, registration_step }: PersistenceUser): DomainUser {
+    const mapped_courses = courses.map((course) =>
       DomainCourse.existing({}, course.id),
     );
 
-    return DomainUser.existing({ courses }, id);
+    return DomainUser.existing({ courses: mapped_courses, registration_step }, id);
   }
 
   toPersistence(aggregateRoot: DomainUser): PersistenceUser {
@@ -28,6 +28,7 @@ class TypeORMUserMapper implements UserMapper {
 
     return {
       id: aggregateRoot.id.value,
+      registration_step: aggregateRoot.getRegistrationStep(),
       courses,
     };
   }
@@ -37,7 +38,7 @@ class TypeORMUserRepository implements UserRepository {
   constructor(
     private readonly manager: EntityManager,
     private readonly mapper: UserMapper,
-  ) {}
+  ) { }
 
   async save(aggregateRoot: DomainUser) {
     const persistence = this.mapper.toPersistence(aggregateRoot);
@@ -53,7 +54,7 @@ class TypeORMUserRepository implements UserRepository {
 }
 
 export class TypeORMUserRepositoryFactory implements UserRepositoryFactory {
-  constructor(private readonly manager: EntityManager) {}
+  constructor(private readonly manager: EntityManager) { }
 
   create(): UserRepository {
     const mapper = new TypeORMUserMapper();

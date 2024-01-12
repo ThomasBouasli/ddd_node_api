@@ -11,11 +11,19 @@ import { Course } from "../course";
 
 export interface UserProps {
   courses?: WatchedList<Course>;
+  registration_step: UserRegistrationStep
 }
 
 export interface CreateUserProps {
   courses?: Course[];
+  registration_step?: UserRegistrationStep
 }
+
+export enum UserRegistrationStep {
+  BasicInformation,
+  Done
+}
+
 
 export class UserCourses extends WatchedList<Course> {
   compareItems(a: Course, b: Course): boolean {
@@ -28,12 +36,13 @@ export class UserCourses extends WatchedList<Course> {
 
 export class User extends AggregateRoot<UserProps> {
   private _courses: WatchedList<Course>;
+  private _registration_step: UserRegistrationStep;
 
   private constructor(props: CreateUserProps, id?: string) {
     const courses = new UserCourses(props.courses);
     super(
       {
-        ...props,
+        registration_step: props.registration_step ?? UserRegistrationStep.BasicInformation,
         courses: courses,
       },
       id,
@@ -41,6 +50,13 @@ export class User extends AggregateRoot<UserProps> {
   }
 
   addCourse(course: Course): Either<DomainValidationError, void> {
+
+    if (this._registration_step !== UserRegistrationStep.Done) {
+      return left(
+        new DomainValidationError("User has not finished the onboarding process!"),
+      );
+    }
+
     if (this._courses?.getItems().length >= 3) {
       return left(
         new DomainValidationError("User already has 3 or more courses!"),
@@ -56,7 +72,11 @@ export class User extends AggregateRoot<UserProps> {
     return this._courses;
   }
 
-  static create(props: CreateUserProps) {
+  getRegistrationStep() {
+    return this._registration_step
+  }
+
+  static create(props: Omit<CreateUserProps, "registration_step">) {
     return new User(props);
   }
 
